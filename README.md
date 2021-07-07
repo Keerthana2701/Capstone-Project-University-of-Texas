@@ -69,6 +69,7 @@ the error. Here we used categorical_crossentropy since it is a multiclass proble
 Predictions are done and the classification report is generated. The model results were
 satisfactory but we decided to increase the model accuracy by using LSTM Model
 
+
 Design, Train and Test LSTM Classifier
 LSTM network models are a type of recurrent neural network that are able to learn and
 remember over long sequences of input data. Since LSTMs are suited for classification, they may
