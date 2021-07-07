@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;1,100;1,200;1,300;1,400;1,500&family=Source+Code+Pro:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,900;1,200;1,300;1,400;1,500;1,600;1,700;1,900&display=swap"
+        rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: black;
+            text-align: center;
+            padding: 0px;
+            color: white;
+        }
+
+        #chatbox {
+            width: 70vw;
+            margin: auto;
+            max-height: 65vh;
+            overflow-y: auto;
+            height: 65vh;
+            background: #373737;
+            padding: 20px;
+            border-radius: 15px 15px 0px 0px;
+        }
+
+        #box {
+            border-radius: 60px;
+            border-color: 45px;
+            border-style: solid;
+            font-family: cursive;
+            text-align: center;
+            background-color: rgb(168, 131, 61);
+            font-size: medium;
+            position: absolute;
+            width: 700px;
+            bottom: 9%;
+            height: 850px;
+            right: 30%;
+            padding: 0px;
+            margin: 0px;
+            font-size: 14px;
+        }
+
+        .botText {
+            text-align: left;
+            color: black;
+            margin-bottom: 40px;
+        }
+
+        .botSpan {
+            background-color: aquamarine;
+            padding: 15px;
+            border-radius: 65px 65px 65px 0px;
+            width: auto;
+            max-width: 35vw;
+            display: inline-block;
+        }
+
+        .userText {
+            text-align: right;
+            color: black;
+            margin-bottom: 40px;
+            margin-right: 30px;
+        }
+
+        .userSpan {
+            background-color: dodgerblue;
+            padding: 15px;
+            border-radius: 65px 30px 0px 65px;
+            width: auto;
+            max-width: 35vw;
+            display: inline-block;
+        }
+
+        #first {
+            border-radius: 14px;
+            height: 25px;
+            font-size: 20px;
+            text-align: center;
+        }
+
+        #convo {
+            height: 65vh;
+        }
+
+        #textInput:active {
+            border: 3px solid #555;
+        }
+
+        #textInput {
+            width: 70.5vw;
+            padding: 15px;
+            border-radius: 50px;
+            margin-top: 15px;
+            border: 15px solid #3f826b;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>
+        GL Chatbot
+    </h1>
+    <div class="box"></div>
+    <div class="boxed">
+        <div id="convo">
+            <div id="chatbox">
+                <p class="botText">
+                    <span class="botSpan">Hey there! This is GL Bot.</span>
+                </p>
+            </div>
+        </div>
+        <div id="userInput">
+            <input id="textInput" type="text" name="msg" placeholder="Message" />
+            <div class="row" style="position: absolute; right: 46%; padding-top: 1em;">
+                <button id="chatAgain" style="display: none; height: 3em; width: 10em">Chat again?</button>
+            </div>
+        </div>
+        <script>
+            function getBotResponse() {
+                var rawText = $("#textInput").val();
+                var userHtml = '<p class="userText"><span class="userSpan">' + rawText + "</span></p>";
+                $("#textInput").val("");
+                $("#chatbox").append(userHtml);
+                $('#chatbox').animate({
+                    scrollTop: 1000
+                }, 1500);
+                document.getElementById("userInput").scrollIntoView({ block: "start", behavior: "smooth" });
+
+                $.get("/predict", { msg: rawText }).done(function (data) {
+                    if (data['active'] == 0) {
+                        $('#textInput').attr('disabled', 'disabled');
+                        $('#chatAgain').css('display', 'block');
+                    }
+                    var botHtml = '<p class="botText" style="margin:10px 0px"><span class="botSpan"> ' + data['pred'] + ' </span></p>';
+                    $("#chatbox").append(botHtml);
+
+                    if ((data['active'] == 1) & (data['accident_level'] > 0)) {
+                        var botHtml = '<p class="botText" style="margin:10px 0px"><span class="botSpan"> Mean accident level: ' + data['accident_level'] + ' </span></p>';
+                        $("#chatbox").append(botHtml);
+                        var botHtml = '<p class="botText" style="margin-top: 0px;"><span class="botSpan"> Mean potential accident level: ' + data['potential_accident_level'] + ' </span></p>';
+                        $("#chatbox").append(botHtml);
+                    }
+                    document.getElementById("userInput").scrollIntoView({ block: "start", behavior: "smooth" });
+                    $('#chatbox').animate({
+                        scrollTop: 1000
+                    }, 1500);
+                });
+            }
+            $("#textInput").keypress(function (e) {
+                if (e.which == 13) {
+                    getBotResponse();
+                }
+            });
+            $("#chatAgain").click(function (d) {
+                $('#textInput').prop("disabled", false);
+                $('#chatAgain').css('display', 'none');
+                var arr = ["How can I help you?", "Can you please provide the description of the accident?"];
+                var botHtml = '<p class="botText" style="margin:10px 0px"><span class="botSpan"> ' + arr[Math.floor(Math.random() * arr.length)] + ' </span></p>';
+                $("#chatbox").append(botHtml);
+                document.getElementById("userInput").scrollIntoView({ block: "start", behavior: "smooth" });
+            });
+
+            var arr = ["How can I help you?", "Can you please provide the description of the accident?"];
+            var botHtml = '<p class="botText" style="margin:10px 0px"><span class="botSpan"> ' + arr[Math.floor(Math.random() * arr.length)] + ' </span></p>';
+            $("#chatbox").append(botHtml);
+            document.getElementById("userInput").scrollIntoView({ block: "start", behavior: "smooth" });
+        </script>
+    </div>
+</body>
+
+</html>
