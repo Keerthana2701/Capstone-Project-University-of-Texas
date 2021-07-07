@@ -35,6 +35,7 @@ the document and the higher the score is, the rarer the term is in the given doc
 vice-versa
 
 Design, Train and Test Machine Learning Classifiers
+
 Since we need to create a classification model we started with ML models to create a benchmark
 for our future model training. The data was trained using the below Machine Learning
 algorithms:
@@ -46,6 +47,7 @@ predictions and achieve better performance compared to other classification mode
 
 
 Design, Train and Test Neural Networks Classifier
+
 The data was trained using a neural network using a sequential model. We built a traditional NN
 model to classify the text description into different critical risks.
 Model Structure:
@@ -71,6 +73,7 @@ satisfactory but we decided to increase the model accuracy by using LSTM Model
 
 
 Design, Train and Test LSTM Classifier
+
 LSTM network models are a type of recurrent neural network that are able to learn and
 remember over long sequences of input data. Since LSTMs are suited for classification, they may
 be a good fit for this problem.
@@ -91,6 +94,54 @@ most effective optimization algorithms for training neural networks. It combines
 RMSProp and Momentum.
 The model is fit and evaluated. The loss and accuracy is found from model.evaluate. The results
 are plotted and a classification report is generated
+
+Model Finalization
+
+● The LSTM model has the highest combined accuracy on train and validation dataset
+● The LSTM model also performs best in terms of precision, recall & F1 score. It also
+doesn't have dependency on the bag of words present in the dataset.
+● Also as seen in the comparison of confusion matrix the LSTM classification results are
+better than other models
+
+Saving Model
+
+Python pickle module is used for serializing and de-serializing python object structures. Used to
+save complicated data. It is easy to use, lighter and doesn’t require several lines of code.The
+pickled file generated is not easily readable and thus provide some security.We pickle the LSTM
+model to use it in flask application.
+We saved the model and its weight as an .h5 file. The file was used in the backend of chatbot to
+make the predictions and also for future updates / training.
+
+Integration of Model to User Interface
+
+We need to integrate our model to UI for the users to use the chatbot to determine the critical risk
+for the accident description provided by the user.
+
+Creating Web Application using Flask
+
+Flask web application was used for UI.
+To install flask: pip install flask
+We need to create 2 files: python file app.py (say) and an index.html file
+app.py file: python file where we import the necessary libraries, create flask app,load pickle file.
+The render_template ('index.html') looks for a file called index.html in the templates folder.
+The /predict is a post method where we pass the features to the model.pkl file so that the model
+will take the input and give output.
+We pass the description field and perform cleaning, preprocessing,tokenizer followed by pad
+sequences to it. Request.form.values takes input from all text fields and store it in a feature
+called int_features.Give this to model as model.predict
+A function to predict the description is defined that predicts the critical risk along with the
+accident level and the potential accident level. If the description is out of range of the trained
+text, then it displays the message "Sorry, I didn't get that.", "Sorry! I don't have an answer for
+that."
+This will return the prediction to the index.html page which outputs the prediction.
+The application will run locally on the URL. Open a browser and type in the URL to run the
+application.
+Index.html file: The styles of output template is defined – background color, text alignment,font
+size, postion,padding, border radius, font family, border radius is defined.
+It starts with greeting note followed by getting the description as input.
+It provides the critical risk category with the accident level and potential accident level and
+prompts the user if they still need any help with other descriptions. If another description is
+provided by the user, then it provides the output until the user replies back with bye
 
 
 ![ss1](https://user-images.githubusercontent.com/67209958/124840599-37ae4180-df40-11eb-86de-60b40d7dd453.JPG)
